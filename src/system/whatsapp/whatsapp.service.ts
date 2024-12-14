@@ -12,7 +12,7 @@ export class WhatsappService implements OnModuleInit {
         clientId: 'bhsafezone-service',
       }),
       puppeteer: {
-        headless: true, // O Puppeteer usará o Chromium baixado automaticamente
+        headless: true,
       },
     });
 
@@ -37,36 +37,11 @@ export class WhatsappService implements OnModuleInit {
     this.client.initialize();
   }
 
-  async fetchMessage(): Promise<any> {
-    this.client.on('ready', () => {
-      console.log('okay');
-    });
+  async fetchMessage(id: string): Promise<any> {
+    const groupChat2 = await this.client.getChatById(id);
 
-    const groupName = 'BHAZap #25'; // Substitua pelo nome do grupo
+    const messages = await groupChat2.fetchMessages({});
 
-    const chats = await this.client.getChats();
-
-    const groupChat = chats.find((c) => c.name === groupName);
-
-    if (!groupChat) {
-      console.log('Grupo não encontrado!');
-      return;
-    }
-
-    const groupChat2 = await this.client.getChatById(groupChat.id._serialized);
-
-    const messages = await groupChat2.fetchMessages({ limit: 50 });
-
-    console.log({ messages });
-    console.log({ tamanho: messages.length });
-
-    return groupChat;
+    return messages;
   }
 }
-
-// name: 'BHAZap #19',
-// id: {
-//   server: 'g.us',
-//   user: '120363285740319093',
-//   _serialized: '120363285740319093@g.us'
-// }

@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { WhatsappModule } from './system/whatsapp/whatsapp.module';
 import { BhazapModule } from './modules/bhazap/bhazap.module';
+import { WhatsappModule } from './system/whatsapp/whatsapp.module';
 @Module({
-  imports: [WhatsappModule, BhazapModule],
+  imports: [
+    MongooseModule.forRoot('mongodb://localhost:27017/bh-safezone'),
+    WhatsappModule,
+    BhazapModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
