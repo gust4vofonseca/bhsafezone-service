@@ -4,7 +4,8 @@ import { BhazapService } from './bhazap.service';
 @Controller('bhazap')
 export class BhazapController {
   constructor(private readonly bhazapService: BhazapService) {}
-  @Post('send')
+
+  @Post()
   async sendMessage(): Promise<void> {
     await this.bhazapService.execute();
   }

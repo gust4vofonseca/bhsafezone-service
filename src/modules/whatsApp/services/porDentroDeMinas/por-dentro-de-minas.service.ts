@@ -3,7 +3,7 @@ import { WhatsappService } from '../../../../system/whatsapp/whatsapp.service';
 import { WhatsAppRepository } from '../../repository/whatsapp.repository';
 
 @Injectable()
-export class BhazapService {
+export class PorDentroDeMinasService {
   constructor(
     @Inject(WhatsappService)
     private whatsappService: WhatsappService,
@@ -15,16 +15,19 @@ export class BhazapService {
   async execute(): Promise<void> {
     console.log('Chegou aqui');
 
-    //120363372671317259@g.us
+    //120363040839837629@g.us
     const data = await this.whatsappService.fetchMessage(
-      '120363372671317259@g.us',
+      '120363040839837629@g.us',
     );
 
     for (const item of data) {
       if (item.body !== '') {
-        console.log(item);
         try {
-          await this.whatsAppRepository.create(item);
+          await this.whatsAppRepository.create({
+            ...item,
+            origin: 'por-dentro-de-minas',
+            classified: false,
+          });
         } catch (error) {
           console.log({ error });
         }
@@ -32,3 +35,12 @@ export class BhazapService {
     }
   }
 }
+
+// {
+//   id: {
+//     server: 'g.us',
+//     user: '120363040839837629',
+//     _serialized: '120363040839837629@g.us'
+//   },
+//   name: 'Notícias - Por Dentro de Minas (1)'
+// }

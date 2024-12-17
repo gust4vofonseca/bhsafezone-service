@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { BaseEntity } from '../entity/base.entity';
 import { IBaseMongoRepository } from '../interfaces/baseCommon/base.mongo.repository.interface';
@@ -8,7 +7,11 @@ import { IBaseMongoRepository } from '../interfaces/baseCommon/base.mongo.reposi
 export abstract class BaseMongoRepository<T extends BaseEntity>
   implements IBaseMongoRepository<T>
 {
-  constructor(@InjectModel('WhatsApp') private readonly model: Model<T>) {}
+  protected model: Model<T>;
+
+  constructor(model: Model<T>) {
+    this.model = model;
+  }
 
   async findAll(): Promise<T[]> {
     return await this.model.find().exec();

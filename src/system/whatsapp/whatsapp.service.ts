@@ -1,12 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import * as qrcode from 'qrcode-terminal';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class WhatsappService implements OnModuleInit {
   private client: Client;
 
   constructor() {
+    deleteFolders();
+
     this.client = new Client({
       authStrategy: new LocalAuth({
         clientId: 'bhsafezone-service',
@@ -38,10 +42,38 @@ export class WhatsappService implements OnModuleInit {
   }
 
   async fetchMessage(id: string): Promise<any> {
-    const groupChat2 = await this.client.getChatById(id);
+    try {
+      const getChatById = await this.client.getChatById(id);
 
-    const messages = await groupChat2.fetchMessages({});
+      const messages = await getChatById.fetchMessages({
+        limit: 1000,
+        fromMe: false,
+      });
 
-    return messages;
+      return messages;
+    } catch (error) {
+      console.log({ error });
+      return [];
+    }
+  }
+}
+
+async function deleteFolders() {
+  const foldersToDelete = [
+    path.join(__dirname, '../../../.wwebjs_auth'),
+    path.join(__dirname, '../../../.wwebjs_cache'),
+  ];
+
+  for (const folder of foldersToDelete) {
+    try {
+      if (fs.existsSync(folder)) {
+        await fs.promises.rm(folder, { recursive: true, force: true });
+        console.log(`Deleted: ${folder}`);
+      } else {
+        console.log(`Folder not found: ${folder}`);
+      }
+    } catch (err) {
+      console.error(`Error deleting folder ${folder}:`, err);
+    }
   }
 }
