@@ -56,6 +56,19 @@ export class WhatsappService implements OnModuleInit {
       return [];
     }
   }
+
+  async getChats(): Promise<any> {
+    try {
+      const getChatById = await this.client.getChats();
+
+      console.log({ getChatById });
+
+      return getChatById;
+    } catch (error) {
+      console.log({ error });
+      return [];
+    }
+  }
 }
 
 async function deleteFolders() {
