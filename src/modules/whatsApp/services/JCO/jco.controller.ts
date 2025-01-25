@@ -7,7 +7,7 @@ import { CronEnum } from '../../../../common/enums/cron.enum';
 export class JCOController {
   constructor(private readonly jCOService: JCOService) {}
 
-  @Cron(CronEnum.EVERY_DAY_AT_10AM)
+  @Cron(CronEnum.EVERY_6_HOURS)
   @Post()
   async sendMessage(): Promise<void> {
     await this.jCOService.execute();

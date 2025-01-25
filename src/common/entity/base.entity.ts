@@ -1,5 +1,4 @@
 import { Schema as NestSchema, Prop } from '@nestjs/mongoose';
-import { Schema } from 'mongoose';
 
 @NestSchema({
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },
@@ -22,9 +21,6 @@ export class BaseEntityWithoutTenant {
 }
 
 export class BaseEntity extends BaseEntityWithoutTenant {
-  @Prop({ type: Schema.Types.UUID, nullable: false })
-  tenantid: string;
-
   @Prop({ nullable: true })
-  erp_id: string;
+  _id: string;
 }

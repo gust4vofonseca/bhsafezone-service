@@ -17,8 +17,8 @@ export abstract class BaseMongoRepository<T extends BaseEntity>
     return await this.model.find().exec();
   }
 
-  async findOneById(_id: string, tenantid: string): Promise<T | null> {
-    return await this.model.findOne({ _id, tenantid }).exec();
+  async findOneById(_id: string): Promise<T | null> {
+    return await this.model.findOne({ _id }).exec();
   }
 
   async create(entity: T): Promise<T> {
@@ -26,18 +26,14 @@ export abstract class BaseMongoRepository<T extends BaseEntity>
     return await createdEntity.save();
   }
 
-  async update(
-    _id: string,
-    tenantid: string,
-    entity: Partial<T>,
-  ): Promise<T | null> {
+  async update(_id: string, entity: Partial<T>): Promise<T | null> {
     return await this.model
-      .findOneAndUpdate({ _id, tenantid }, entity, { new: true })
+      .findOneAndUpdate({ _id }, entity, { new: true })
       .exec();
   }
 
-  async delete(_id: string, tenantid: string): Promise<boolean> {
-    const result = await this.model.findOneAndDelete({ _id, tenantid }).exec();
+  async delete(_id: string): Promise<boolean> {
+    const result = await this.model.findOneAndDelete({ _id }).exec();
     return !!result;
   }
 }

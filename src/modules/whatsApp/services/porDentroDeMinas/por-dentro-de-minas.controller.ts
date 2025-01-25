@@ -9,7 +9,7 @@ export class PorDentroDeMinasController {
     private readonly porDentroDeMinasService: PorDentroDeMinasService,
   ) {}
 
-  @Cron(CronEnum.EVERY_DAY_AT_10AM)
+  @Cron(CronEnum.EVERY_6_HOURS)
   @Post()
   async sendMessage(): Promise<void> {
     await this.porDentroDeMinasService.execute();

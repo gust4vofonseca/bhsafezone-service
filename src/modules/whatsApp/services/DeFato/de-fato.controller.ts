@@ -7,7 +7,7 @@ import { CronEnum } from '../../../../common/enums/cron.enum';
 export class DeFatoController {
   constructor(private readonly deFatoService: DeFatoService) {}
 
-  @Cron(CronEnum.EVERY_DAY_AT_10AM)
+  @Cron(CronEnum.EVERY_6_HOURS)
   @Post()
   async sendMessage(): Promise<void> {
     await this.deFatoService.execute();
