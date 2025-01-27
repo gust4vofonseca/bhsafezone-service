@@ -58,7 +58,6 @@ export class ClassifierService {
     crimesWithType.forEach((message) => {
       trainingData.push({
         input: textToFeatures(`${message.body}`),
-
         output: { crime: 1 },
       });
     });
@@ -68,7 +67,6 @@ export class ClassifierService {
     nonCrimesWithType.forEach((message) => {
       trainingData.push({
         input: textToFeatures(`${message.body}`),
-
         output: { crime: 0 },
       });
     });
@@ -78,25 +76,38 @@ export class ClassifierService {
     nonCrimesWithoutType.forEach((message) => {
       trainingData.push({
         input: textToFeatures(`${message.body}`),
-
         output: { crime: 0 },
       });
     });
 
-    if (trainingData.length < 10) {
-      [
-        {
-          input: textToFeatures('assaltaram na esquina'),
-          output: { crime: 1 },
-        },
-        { input: textToFeatures('bom dia, amigos'), output: { crime: 0 } },
-        {
-          input: textToFeatures('alguém foi furtado ontem'),
-          output: { crime: 1 },
-        },
-        { input: textToFeatures('tem promoção na loja'), output: { crime: 0 } },
-      ].map((item) => trainingData.push(item));
-    }
+    [
+      {
+        input: textToFeatures('assaltaram na esquina'),
+        output: { crime: 1 },
+      },
+      {
+        input: textToFeatures(
+          'Furtaram uma moto no estacionamento de um mercado',
+        ),
+        output: { crime: 1 },
+      },
+      { input: textToFeatures('bom dia, amigos'), output: { crime: 0 } },
+      {
+        input: textToFeatures(
+          'Uma menina foi abusada hoje por um homem no metro',
+        ),
+        output: { crime: 1 },
+      },
+      {
+        input: textToFeatures('alguém foi furtado ontem'),
+        output: { crime: 1 },
+      },
+      { input: textToFeatures('tem promoção na loja'), output: { crime: 0 } },
+      {
+        input: textToFeatures('Os preços no supermercado esta um roubo'),
+        output: { crime: 0 },
+      },
+    ].map((item) => trainingData.push(item));
 
     try {
       this.classifier.train(trainingData);

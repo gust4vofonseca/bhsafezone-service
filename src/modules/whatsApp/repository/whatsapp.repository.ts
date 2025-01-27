@@ -15,19 +15,21 @@ export class WhatsAppRepository extends BaseMongoRepository<WhatsApp> {
   }
 
   public async getByClassifiedFalse(): Promise<WhatsApp[]> {
-    return this.model.find().exec();
+    return this.model.find({ classified: false }).exec();
   }
 
   public async getByIsCrimeTrueWithType(): Promise<WhatsApp[]> {
     return this.model
       .find({ isCrime: true, crimeType: { $exists: true } })
-      .limit(20)
+      .sort({ update_at: -1 })
+      .limit(50)
       .exec();
   }
 
   public async getByIsCrimeFalseWithType(): Promise<WhatsApp[]> {
     return this.model
       .find({ isCrime: false, crimeType: { $exists: true } })
+      .sort({ update_at: -1 })
       .limit(20)
       .exec();
   }
@@ -35,6 +37,7 @@ export class WhatsAppRepository extends BaseMongoRepository<WhatsApp> {
   public async getByIsCrimeFalseWithoutType(): Promise<WhatsApp[]> {
     return this.model
       .find({ isCrime: false, crimeType: { $exists: false } })
+      .sort({ update_at: -1 })
       .limit(20)
       .exec();
   }
