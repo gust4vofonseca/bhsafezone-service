@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { WhatsAppRepository } from '../../whatsApp/repository/whatsapp.repository';
 import { NeuralNetwork } from 'brain.js';
 import { FilterService } from './filter';
-import { locateARegion } from './location';
+import { RegionService } from './location';
 
 @Injectable()
 export class ClassifierService {
@@ -31,13 +31,15 @@ export class ClassifierService {
         const features = textToFeatures(text);
         const prediction = this.classifier.run(features);
         const isCrime = prediction.crime > 0.5;
-        const region = locateARegion(text);
+        const region = await new RegionService().identificarRegiao(text);
+
+        console.log({ region });
 
         await this.whatsAppRepository.update(item._id, {
           classified: true,
           crimeType: filter,
           isCrime: isCrime,
-          region,
+          region: region,
         });
       } else {
         await this.whatsAppRepository.update(item._id, {
