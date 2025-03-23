@@ -1,26 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { spawn } from 'child_process';
 import { WhatsAppRepository } from '../../whatsApp/repository/whatsapp.repository';
-import { NeuralNetwork } from 'brain.js';
 import { FilterService } from './filter';
-import { RegionService } from './location';
 
 @Injectable()
 export class ClassifierService {
-  private classifier: NeuralNetwork<Record<string, number>, { crime: number }>;
-
   constructor(
     @Inject(WhatsAppRepository)
     private whatsAppRepository: WhatsAppRepository,
 
     @Inject(FilterService)
     private filterService: FilterService,
-  ) {
-    this.classifier = new NeuralNetwork();
-  }
+  ) {}
 
-  async execute(): Promise<void> {
-    if (!(await this.train())) return;
-
+  async execute(): Promise<any> {
+    let index = 0;
     const data = await this.whatsAppRepository.getByClassifiedFalse();
 
     for (const item of data) {
@@ -28,106 +22,52 @@ export class ClassifierService {
       const filter = this.filterService.containsCrime(text);
 
       if (filter) {
-        const features = textToFeatures(text);
-        const prediction = this.classifier.run(features);
-        const isCrime = prediction.crime > 0.5;
-        const region = await new RegionService().identificarRegiao(text);
-
-        console.log({ region });
-
+        index++;
         await this.whatsAppRepository.update(item._id, {
-          classified: true,
-          crimeType: filter,
-          isCrime: isCrime,
-          region: region,
+          classified: 0,
+          crime: filter,
         });
       } else {
         await this.whatsAppRepository.update(item._id, {
-          classified: true,
-          isCrime: false,
+          classified: 1,
+          is_crime: 0,
         });
       }
     }
 
-    console.log('Fim da classificação');
-  }
+    console.log({ index });
 
-  async train(): Promise<boolean> {
-    const trainingData = [];
+    new Promise((resolve, reject) => {
+      const pythonProcess = spawn('python3', [
+        'src/modules/classifier/services/classifier.py',
+      ]);
 
-    const crimesWithType =
-      await this.whatsAppRepository.getByIsCrimeTrueWithType();
-    crimesWithType.forEach((message) => {
-      trainingData.push({
-        input: textToFeatures(`${message.body}`),
-        output: { crime: 1 },
+      let output = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        output += data.toString();
       });
-    });
 
-    const nonCrimesWithType =
-      await this.whatsAppRepository.getByIsCrimeFalseWithType();
-    nonCrimesWithType.forEach((message) => {
-      trainingData.push({
-        input: textToFeatures(`${message.body}`),
-        output: { crime: 0 },
+      pythonProcess.stderr.on('data', (data) => {
+        const errorMessage = data.toString();
+        console.error(`Erro: ${errorMessage}`);
+
+        // Ignorar mensagens do NLTK que não são erros críticos
+        if (!errorMessage.includes('[nltk_data]')) {
+          reject(new Error(errorMessage));
+        }
       });
-    });
 
-    const nonCrimesWithoutType =
-      await this.whatsAppRepository.getByIsCrimeFalseWithoutType();
-    nonCrimesWithoutType.forEach((message) => {
-      trainingData.push({
-        input: textToFeatures(`${message.body}`),
-        output: { crime: 0 },
+      pythonProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve(output);
+        } else {
+          reject(new Error(`Processo encerrado com código ${code}`));
+        }
       });
+    }).catch((err) => {
+      console.error('Erro no processamento do classificador:', err);
+      throw err;
     });
-
-    [
-      {
-        input: textToFeatures('assaltaram na esquina'),
-        output: { crime: 1 },
-      },
-      {
-        input: textToFeatures(
-          'Furtaram uma moto no estacionamento de um mercado',
-        ),
-        output: { crime: 1 },
-      },
-      { input: textToFeatures('bom dia, amigos'), output: { crime: 0 } },
-      {
-        input: textToFeatures(
-          'Uma menina foi abusada hoje por um homem no metro',
-        ),
-        output: { crime: 1 },
-      },
-      {
-        input: textToFeatures('alguém foi furtado ontem'),
-        output: { crime: 1 },
-      },
-      { input: textToFeatures('tem promoção na loja'), output: { crime: 0 } },
-      {
-        input: textToFeatures('Os preços no supermercado esta um roubo'),
-        output: { crime: 0 },
-      },
-    ].map((item) => trainingData.push(item));
-
-    try {
-      this.classifier.train(trainingData);
-
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
-}
-
-function textToFeatures(text: string): Record<string, number> {
-  const words = text.toLowerCase().split(/\s+/);
-  const features: Record<string, number> = {};
-
-  for (const word of words) {
-    features[word] = (features[word] || 0) + 1;
-  }
-
-  return features;
 }

@@ -26,7 +26,7 @@ export class DeFatoService {
           await this.whatsAppRepository.create({
             ...item,
             origin: 'DeFato',
-            classified: false,
+            classified: 0,
           });
         } catch (error) {
           console.log({ error });

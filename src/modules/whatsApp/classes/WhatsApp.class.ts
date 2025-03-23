@@ -26,10 +26,12 @@ export class WhatsApp extends BaseEntity {
   title?: string; // Título associado à mensagem (se aplicável)
   description?: string; // Descrição da mensagem
   links?: { link: string; isSuspicious: boolean }[]; // Lista de links na mensagem
-  classified?: boolean; // Indica se a mensagem foi classificada
-  isCrime?: boolean; // Indica se a mensagem se refere a um crime
+  classified?: number; // Indica se a mensagem foi classificada
+  is_crime?: number; // Indica se a mensagem se refere a um crime
   region?: string;
-  crimeType?: string; // Tipo de crime identificado
+  bairro?: string;
+  crime?: string; // Tipo de crime identificado
   created_at?: Date; // Data de criação
   updated_at?: Date; // Data de atualização
+  integrated?: number;
 }

@@ -24,7 +24,7 @@ export class AgitoMaisService {
           await this.whatsAppRepository.create({
             ...item,
             origin: 'Agito Mais',
-            classified: false,
+            classified: 0,
           });
         } catch (error) {
           console.log({ error });

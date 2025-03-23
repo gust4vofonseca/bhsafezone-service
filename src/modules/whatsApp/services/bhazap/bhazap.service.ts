@@ -13,7 +13,6 @@ export class BhazapService {
   ) {}
 
   async execute(): Promise<void> {
-    //120363372671317259@g.us
     const data = await this.whatsappService.fetchMessage(
       '120363372671317259@g.us',
     );
@@ -24,7 +23,7 @@ export class BhazapService {
           await this.whatsAppRepository.create({
             ...item,
             origin: 'bhazap',
-            classified: false,
+            classified: 0,
           });
         } catch (error) {
           console.log({ error });
@@ -33,12 +32,3 @@ export class BhazapService {
     }
   }
 }
-
-// {
-//   id: {
-//     server: 'g.us',
-//     user: '120363372671317259',
-//     _serialized: '120363372671317259@g.us'
-//   },
-//   name: 'BHAZap #25'
-// }

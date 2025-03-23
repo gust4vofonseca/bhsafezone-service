@@ -15,7 +15,11 @@ export class WhatsAppRepository extends BaseMongoRepository<WhatsApp> {
   }
 
   public async getByClassifiedFalse(): Promise<WhatsApp[]> {
-    return this.model.find({ classified: false }).exec();
+    return this.model.find({ classified: 0 }).exec();
+  }
+
+  public async getByIntegratedFalse(): Promise<WhatsApp[]> {
+    return this.model.find({ integrated: 0 }).exec();
   }
 
   public async getByIsCrimeTrueWithType(): Promise<WhatsApp[]> {

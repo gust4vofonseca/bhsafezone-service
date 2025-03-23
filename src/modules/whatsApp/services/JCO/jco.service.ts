@@ -26,7 +26,7 @@ export class JCOService {
           await this.whatsAppRepository.create({
             ...item,
             origin: 'JCO',
-            classified: false,
+            classified: 0,
           });
         } catch (error) {
           console.log({ error });

@@ -5,6 +5,7 @@
 /.wwebjs_auth
 /.wwebjs_cache
 
+src/firebase-key.json
 # Logs
 logs
 *.log

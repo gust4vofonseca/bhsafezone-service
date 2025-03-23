@@ -26,9 +26,10 @@ export abstract class BaseMongoRepository<T extends BaseEntity>
     return await createdEntity.save();
   }
 
-  async update(_id: string, entity: Partial<T>): Promise<T | null> {
+  async update(_id: string, entity: Partial<T>): Promise<any> {
     return await this.model
       .findOneAndUpdate({ _id }, entity, { new: true })
+      .lean()
       .exec();
   }
 

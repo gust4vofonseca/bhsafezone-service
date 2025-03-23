@@ -26,7 +26,7 @@ export class PorDentroDeMinasService {
           await this.whatsAppRepository.create({
             ...item,
             origin: 'por-dentro-de-minas',
-            classified: false,
+            classified: 0,
           });
         } catch (error) {
           console.log({ error });
